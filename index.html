@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - lines - splines</title>
+		<title>Studio Fluora</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<style>
@@ -27,7 +27,7 @@
 			}
 
 			a {
-				color: orange;
+				color: white;
 				text-decoration: none;
 			}
 
@@ -39,14 +39,7 @@
 	</head>
 	<body>
 
-		<div id="info">
-			<a href="http://threejs.org" target="_blank">three.js</a> - splines WebGL demo
-			[<a href="http://en.wikipedia.org/wiki/Hilbert_curve">Hilbert curve</a> thanks to <a href="http://www.openprocessing.org/visuals/?visualID=15599">Thomas Diewald</a>]
-		</div>
-
 		<script src="static/js/three.js"></script>
-
-		<script src="static/js/hilbert.js"></script>
 
 		<script src="static/js/Detector.js"></script>
 		<script src="static/js/stats.min.js"></script>
@@ -62,12 +55,29 @@
 
 			camera, scene, renderer, material;
 
+			var flowerNull = null;
+
 			init();
 			animate();
 
 			function init() {
 
 				var i, n_sub, container;
+
+				//--------------------------------	
+
+				var numPetals = 60;
+				var cx = 0.0;
+				var cz = 0.0;
+				var cy = -20.0;
+				var dontdraw = false;
+				var flip = 100;
+
+				var endV = []; //60
+				var hiC = []; //60
+				var lowC = []; //60
+
+				//--------------------------------
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -82,76 +92,94 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var geometry = new THREE.Geometry(),
-					geometry2 = new THREE.Geometry(),
-					geometry3 = new THREE.Geometry(),
-					points = hilbert3D( new THREE.Vector3( 0,0,0 ), 200.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 ),
-					colors = [], colors2 = [], colors3 = [];
 
-				n_sub = 6;
-
-				var position, index;
-
-				var spline = new THREE.CatmullRomCurve3( points );
-
-				for ( i = 0; i < points.length * n_sub; i ++ ) {
-
-					index = i / ( points.length * n_sub );
-					position = spline.getPoint( index );
-
-					geometry.vertices[ i ] = new THREE.Vector3( position.x, position.y, position.z );
-
-					colors[ i ] = new THREE.Color( 0xffffff );
-					colors[ i ].setHSL( 0.6, 1.0, Math.max( 0, - position.x / 200 ) + 0.5 );
-
-					colors2[ i ] = new THREE.Color( 0xffffff );
-					colors2[ i ].setHSL( 0.9, 1.0, Math.max( 0, - position.y / 200 ) + 0.5 );
-
-					colors3[ i ] = new THREE.Color( 0xffffff );
-					colors3[ i ].setHSL( i / ( points.length * n_sub ), 1.0, 0.5 );
-
-
+				function radians (a) {
+					return a/180.0*3.14159;
 				}
 
-				geometry2.vertices = geometry3.vertices = geometry.vertices;
+				  //fill endV
+			  for (var i = 0; i < numPetals; i++) {
+			    var a = i*6;
+			    var angle = radians(a);
+			    var x = cx + Math.cos(angle) * 170; //DO RADIAN MATH
+			    var y = -50.0;
+			    var z = cz + Math.sin(angle) * 170;
+			    endV[i] = new THREE.Vector3(x, y, z);
+			  }
 
-				geometry.colors = colors;
-				geometry2.colors = colors2;
-				geometry3.colors = colors3;
+			  ////fill hiC
+			  for (var i = 0; i < numPetals; i++) {
+			    var a = i*6;
+			    var angle = radians(a);
+			    var x = cx + Math.cos(angle) * 120;
+			    var y = -120.0;
+			    var z = cz + Math.sin(angle) * 120;
+			    hiC[i] = new THREE.Vector3(x, y, z);
+			  }
 
-				// lines
+			  //fill lowC
+			  for (var i = 0; i < numPetals; i++) {
+			    var a = i*6;
+			    var angle = radians(a);
+			    var x = cx + Math.cos(angle) * 100;
+			    var y = 11.2;
+			    var z = cz + Math.sin(angle) * 100;
+			    lowC[i] = new THREE.Vector3(x, y, z);
+			  }
 
-				material = new THREE.LineBasicMaterial( { color: 0xffffff, opacity: 1, linewidth: 3, vertexColors: THREE.VertexColors } );
+			    //stem
+				var curve = new THREE.CubicBezierCurve3(
+					new THREE.Vector3( cx, cy, cz),
+					new THREE.Vector3( cx, cy+70, cz),
+					new THREE.Vector3( cx-30, cy+130, cz+40),
+					new THREE.Vector3( cx-60, cy+250, cz-40)
+				);
 
-				var line, p, scale = 0.3, d = 225;
-				var parameters =  [
-					[ material, scale*1.5, [-d,0,0],  geometry ],
-					[ material, scale*1.5, [0,0,0],  geometry2 ],
-					[ material, scale*1.5, [d,0,0],  geometry3 ]
-				];
+				var geometry = new THREE.Geometry();
+				geometry.vertices = curve.getPoints( 50 ); //resolution
 
-				for ( i = 0; i < parameters.length; ++ i ) {
+				var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-					p = parameters[ i ];
-					line = new THREE.Line( p[ 3 ],  p[ 0 ] );
-					line.scale.x = line.scale.y = line.scale.z =  p[ 1 ];
-					line.position.x = p[ 2 ][ 0 ];
-					line.position.y = p[ 2 ][ 1 ];
-					line.position.z = p[ 2 ][ 2 ];
-					scene.add( line );
+				// Create the final object to add to the scene
+				var curveObject = new THREE.Line( geometry, material );
+				curveObject.position.y = 40;
 
-				}
+				flowerNull = new THREE.Group();
+				flowerNull.add(curveObject);
+				curveObject.rotation.x = 3.14159;
+				curveObject.rotation.z = -.52;
+
+				scene.add(flowerNull);
 
 
+				  //petals
+			  for (var i = 0; i < 60; i++) {
+			    var flip = (i+1) % 5;
+			    if (flip == 0) {
+			      dontdraw = !dontdraw;
+			    };
+
+			    if (!dontdraw) {
+
+			    var petalCurve = new THREE.CubicBezierCurve3(
+			    		new THREE.Vector3(cx, cy, cz), 
+			        new THREE.Vector3(hiC[i].x, hiC[i].y, hiC[i].z), 
+			        new THREE.Vector3(lowC[i].x, lowC[i].y, lowC[i].z), 
+			        new THREE.Vector3(endV[i].x, endV[i].y, endV[i].z)
+			      );
+			  	var petalGeometry = new THREE.Geometry();
+					petalGeometry.vertices = petalCurve.getPoints( 50 ); //resolution
+
+					// Create the final object to add to the scene
+					var petalCurveObject = new THREE.Line( petalGeometry, material );
+					//petalCurveObject.position.y = -100;
+
+			    curveObject.add(petalCurveObject);
+			    }
+			  }
+
+//--------------------------------------------------------------------------
 				stats = new Stats();
-				//container.appendChild(stats.dom);
-
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
-
-				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -211,24 +239,12 @@
 
 			function render() {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY + 200 - camera.position.y ) * .05;
-
 				camera.lookAt( scene.position );
 
 				var time = Date.now() * 0.0005;
 
-				for ( var i = 0; i < scene.children.length; i ++ ) {
+				flowerNull.rotation.y = time * .5;
 
-					var object = scene.children[ i ];
-
-					if ( object instanceof THREE.Line ) {
-
-						object.rotation.y = time * ( i % 2 ? 1 : -1 );
-
-					}
-
-				}
 
 				renderer.render( scene, camera );
 
