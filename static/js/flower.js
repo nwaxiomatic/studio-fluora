@@ -1,4 +1,10 @@
-if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+if ( ! Detector.webgl ){
+	var imageUrl = 'static/img/background.png';
+	$('body').css('background-image', 'url(' + imageUrl + ') ');
+	$('body').css('background-size', 'contain');
+	$('body').css('background-position', 'center');
+	$('body').css('background-repeat', 'no-repeat');
+}
 
 var mouseX = 0, mouseY = 0,
 
@@ -9,8 +15,10 @@ camera, scene, renderer, material, composer;
 
 var flowerNull = null;
 
-init();
-animate();
+if ( Detector.webgl ) {
+	init();
+	animate();
+}
 
 function init() {
 
