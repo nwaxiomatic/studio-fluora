@@ -23,6 +23,24 @@
 				color:#0078ff;
 			}
 
+			.hidden {
+			    visibility: hidden;
+			    transition: all 2s;
+			    opacity: 0;
+			}
+			.shown {
+			    visibility: visible;
+			    transition: all 2s;
+			    opacity: 1;
+			}
+
+			.black-cover {
+				background-color: black;
+				z-index: 100000;
+				width: 100vw;
+				height: 100vh;
+			}
+
 			#info {
 				position: absolute;
 				top: 10px; width: 100%;
@@ -48,12 +66,13 @@
 				bottom: 1.5em;
 				right: 2em;
 				font-size: 20px;
+				z-index: -1;
 			}
 
 		</style>
 	</head>
 	<body>
-
+		<div class="black-cover hidden shown"></div>
 		<script type="text/javascript" src="static/js/jquery.min.js"> </script>
 		<script src="static/js/three.js"></script>
 
@@ -71,5 +90,9 @@
 		<script src="static/js/flower.js"></script>
 
 		<a id="mailLink" href="mailto:hello@fluora.studio" target="_top">contact</a>
+
+		<script >
+			$('.black-cover').removeClass('shown');
+		</script>
 	</body>
 </html>
