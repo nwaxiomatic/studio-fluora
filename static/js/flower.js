@@ -32,11 +32,11 @@ function init() {
 	document.body.appendChild( container );
 
 	camera = new THREE.PerspectiveCamera( 33, window.innerWidth / window.innerHeight, 1, 10000 );
-	camera.position.z = 700;
+	camera.position.z = 800;
 
 	scene = new THREE.Scene();
 
-	renderer = new THREE.WebGLRenderer( { antialias: true } );
+	renderer = new THREE.WebGLRenderer( { antialias: false } );
 	renderer.setPixelRatio( window.devicePixelRatio );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	container.appendChild( renderer.domElement );
@@ -98,6 +98,7 @@ function init() {
 	curveObject.position.y = 40;
 
 	flowerNull = new THREE.Group();
+	flowerPetalsNull = new THREE.Group();
 	flowerNull.add(curveObject);
 	curveObject.rotation.x = 3.14159;
 	curveObject.rotation.z = -.52;
@@ -124,9 +125,11 @@ function init() {
 			// Create the final object to add to the scene
 			var petalCurveObject = new THREE.Line( petalGeometry, material );
 			//petalCurveObject.position.y = -100;
-	    	curveObject.add(petalCurveObject);
+	    	flowerPetalsNull.add(petalCurveObject);
 	    }
 	}
+	flowerPetalsNull.scale.set(.8, .8, .8);
+	curveObject.add(flowerPetalsNull);
 
 	var renderModel = new THREE.RenderPass( scene, camera );
 	var effectFilm = new THREE.FilmPass( .5, 0.95, 256, false );
