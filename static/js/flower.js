@@ -1,11 +1,3 @@
-if ( ! Detector.webgl ){
-	var imageUrl = 'static/img/background.png';
-	$('body').css('background-image', 'url(' + imageUrl + ') ');
-	$('body').css('background-size', 'contain');
-	$('body').css('background-position', 'center');
-	$('body').css('background-repeat', 'no-repeat');
-}
-
 var mouseX = 0, mouseY = 0,
 
 windowHalfX = window.innerWidth / 2,
@@ -15,7 +7,14 @@ camera, scene, renderer, material, composer;
 
 var flowerNull = null;
 
-if ( Detector.webgl ) {
+if ( ! Detector.webgl ){
+	var imageUrl = 'static/img/background.png';
+	$('body').css('background-image', 'url(' + imageUrl + ') ');
+	$('body').css('background-size', 'contain');
+	$('body').css('background-position', 'center');
+	$('body').css('background-repeat', 'no-repeat');
+}
+else {
 	init();
 	animate();
 }
