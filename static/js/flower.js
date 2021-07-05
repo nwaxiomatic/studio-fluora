@@ -139,7 +139,7 @@ function init() {
 	curveObject.add(flowerPetalsNull);
 
 	var renderModel = new THREE.RenderPass( scene, camera );
-	var effectFilm = new THREE.FilmPass( .5, 0.95, 256, false );
+	var effectFilm = new THREE.FilmPass( .5, 0.95, 256, true );
 	effectFilm.renderToScreen = true;
 	composer = new THREE.EffectComposer( renderer );
 	composer.addPass( renderModel );
